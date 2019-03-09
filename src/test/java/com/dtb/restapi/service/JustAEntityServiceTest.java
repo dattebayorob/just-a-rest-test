@@ -1,5 +1,7 @@
 package com.dtb.restapi.service;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -50,6 +52,7 @@ public class JustAEntityServiceTest {
 		BDDMockito.given(repository.findAll(Mockito.any(Pageable.class))).willReturn(new PageImpl<>(entities));
 		BDDMockito.given(repository.save(Mockito.any(JustAEntity.class))).willReturn(entity);
 		BDDMockito.given(repository.findById(Mockito.anyLong())).willReturn(Optional.of(entity));
+		BDDMockito.doNothing().when(repository).deleteById(Mockito.anyLong());
 	}
 
 	@Test
@@ -60,6 +63,18 @@ public class JustAEntityServiceTest {
 	@Test
 	public void testFindById() {
 		assertTrue(service.findById(Long.valueOf(1)).isPresent());
+	}
+	
+	@Test
+	public void testSave() {
+		assertNotNull(service.save(entity));
+	}
+	
+	@Test
+	public void testDeleteById() {
+		BDDMockito.given(repository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(null));
+		service.deleteById(entity.getId());
+		assertFalse(repository.findById(entity.getId()).isPresent());
 	}
 
 }

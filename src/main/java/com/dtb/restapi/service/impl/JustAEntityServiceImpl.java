@@ -43,4 +43,17 @@ public class JustAEntityServiceImpl implements JustAEntityService{
 		log.info("Service: returning entities"+(enabled?"enabled":"not enabled"));
 		return findByEnabled(enabled);
 	}
+
+	@Override
+	public JustAEntity save(JustAEntity entity) {
+		log.info("Service: persisting a entity: "+entity.toString());
+		return repository.save(entity);
+	}
+
+	@Override
+	public void deleteById(Long id) {
+		log.info("Service: deleting a entity of id: "+id);
+		repository.deleteById(id);
+		
+	}
 }

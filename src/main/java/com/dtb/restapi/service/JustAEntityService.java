@@ -13,4 +13,6 @@ public interface JustAEntityService {
 	Optional<JustAEntity> findById(Long id);
 	List<JustAEntity> findByName(String name);
 	List<JustAEntity> findByEnabled(boolean enabled);
+	JustAEntity save(JustAEntity entity);
+	void deleteById(Long id);
 }
