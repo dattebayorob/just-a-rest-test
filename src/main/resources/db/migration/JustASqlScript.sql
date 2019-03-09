@@ -1,1 +1,1 @@
--- Do Nothing for now
+INSERT INTO entity(name,enabled) VALUES('Just a Entity',true),('Just a Entity 2',true),('Just a Entity 3',false);
