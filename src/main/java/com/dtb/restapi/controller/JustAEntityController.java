@@ -31,6 +31,6 @@ public class JustAEntityController {
 	public ResponseEntity<Page<JustAEntityDto>> findAll(Pageable pageable) {
 		log.info("Controller: Return a response with paginated entities");
 		Page<JustAEntity> entities = service.findAll(pageable);
-		return ResponseEntity.ok(entities.map(entity -> modelMapper.map(entities, JustAEntityDto.class)));
+		return ResponseEntity.ok(entities.map(entity -> modelMapper.map(entity, JustAEntityDto.class)));
 	}
 }
