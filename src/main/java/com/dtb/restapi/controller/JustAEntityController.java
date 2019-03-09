@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
+import com.dtb.restapi.model.response.Response;
 import com.dtb.restapi.service.JustAEntityService;
 
 @RestController
@@ -37,46 +38,47 @@ public class JustAEntityController {
 	private static final Log log = LogFactory.getLog(JustAEntityController.class);
 
 	@GetMapping
-	public ResponseEntity<Page<JustAEntityDto>> findAll(Pageable pageable) {
+	public ResponseEntity<Response> findAll(Pageable pageable) {
 		log.info("Controller: Returning a response with paginated entities");
 		Page<JustAEntity> entities = service.findAll(pageable);
-		return ResponseEntity.ok(entities.map(entity -> modelMapper.map(entity, JustAEntityDto.class)));
+		return ResponseEntity.ok(Response.data(entities.map(entity -> modelMapper.map(entity, JustAEntityDto.class))));
 	}
 
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<JustAEntityDto> findById(@PathVariable("id") Long id) {
+	public ResponseEntity<Response> findById(@PathVariable("id") Long id) {
 		log.info("Controller: Returning a response of a entity dto");
 		Optional<JustAEntity> entity = service.findById(id);
-		return entity.isPresent() ? ResponseEntity.ok(modelMapper.map(entity.get(), JustAEntityDto.class))
+		return entity.isPresent()
+				? ResponseEntity.ok(Response.data(modelMapper.map(entity.get(), JustAEntityDto.class)))
 				: ResponseEntity.notFound().build();
 	}
 
 	@PostMapping
-	public ResponseEntity<JustAEntityDto> save(@Validated @RequestBody JustAEntityDto dto, BindingResult result) {
+	public ResponseEntity<Response> save(@Validated @RequestBody JustAEntityDto dto, BindingResult result) {
 		log.info("Controller: Persisting a entity and returning a response of its dto");
 		if (result.hasErrors())
-			return ResponseEntity.badRequest().build();
-		return ResponseEntity
-				.ok(modelMapper.map(service.save(modelMapper.map(dto, JustAEntity.class)), JustAEntityDto.class));
+			return ResponseEntity.badRequest().body(Response.error(result.getAllErrors()));
+		return ResponseEntity.ok(Response
+				.data(modelMapper.map(service.save(modelMapper.map(dto, JustAEntity.class)), JustAEntityDto.class)));
 	}
 
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<JustAEntityDto> updateById(@PathVariable("id") Long id,
-			@Validated @RequestBody JustAEntityDto dto, BindingResult result) {
+	public ResponseEntity<Response> updateById(@PathVariable("id") Long id, @Validated @RequestBody JustAEntityDto dto,
+			BindingResult result) {
 		log.info("Controller: Updating a entity and returning a response of its dto");
 		Optional<JustAEntity> entity = service.findById(id);
 		if (!entity.isPresent())
 			return ResponseEntity.notFound().build();
 		if (result.hasErrors())
-			return ResponseEntity .badRequest().build();
+			return ResponseEntity.badRequest().body(Response.error(result.getAllErrors()));
 		dto.setId(id);
-		modelMapper.map(modelMapper.map(dto, JustAEntity.class),entity.get());
-		return ResponseEntity.ok(modelMapper.map(service.save(entity.get()), JustAEntityDto.class));
+		modelMapper.map(modelMapper.map(dto, JustAEntity.class), entity.get());
+		return ResponseEntity.ok(Response.data(modelMapper.map(service.save(entity.get()), JustAEntityDto.class)));
 	}
-	
+
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<?> deleteById(@PathVariable("id") Long id) {
-		if(!service.findById(id).isPresent())
+		if (!service.findById(id).isPresent())
 			return ResponseEntity.notFound().build();
 		service.deleteById(id);
 		return ResponseEntity.noContent().build();
