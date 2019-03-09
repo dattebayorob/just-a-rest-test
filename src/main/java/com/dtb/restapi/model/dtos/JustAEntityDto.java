@@ -4,7 +4,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 public class JustAEntityDto {
-	@NotNull
 	private Long id;
 	@NotNull(message = "Its just a Entity, but needs a name!")
 	@Size(min = 3, max = 255, message = "Its just a Entity, but needs at lest 3 caracteres!")
