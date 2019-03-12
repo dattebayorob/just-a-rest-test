@@ -9,10 +9,14 @@ import org.springframework.data.domain.Pageable;
 import com.dtb.restapi.model.entities.JustAEntity;
 
 public interface JustAEntityService {
-	Page<JustAEntity> findAll(Pageable pageable);
+	
+	Optional<Page<JustAEntity>> findAll(Pageable pageable);
+	
 	Optional<JustAEntity> findById(Long id);
-	List<JustAEntity> findByName(String name);
-	List<JustAEntity> findByEnabled(boolean enabled);
+	
+	Optional<List<JustAEntity>> findByName(String name);
+		
 	JustAEntity save(JustAEntity entity);
+	
 	void deleteById(Long id);
 }

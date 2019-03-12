@@ -21,32 +21,30 @@ public class JustAEntityServiceImpl implements JustAEntityService{
 	private static final Log log = LogFactory.getLog(JustAEntityServiceImpl.class);
 	
 	@Override
-	public Page<JustAEntity> findAll(Pageable pageable){
+	public Optional<Page<JustAEntity>> findAll(Pageable pageable){
 		log.info("Service: returning all entities paginateds");
-		return repository.findAll(pageable);
+		
+		return Optional.of(repository.findAll(pageable)).filter(e -> !e.isEmpty());
 	}
 	
 	@Override
 	public Optional<JustAEntity> findById(Long id) {
 		log.info("Service: returning entity by id: "+id);
+		
 		return repository.findById(id);
 	}
 
 	@Override
-	public List<JustAEntity> findByName(String name) {
+	public Optional<List<JustAEntity>> findByName(String name) {
 		log.info("Service: returning entities by name: "+name);
-		return repository.findByName(name);
-	}
-
-	@Override
-	public List<JustAEntity> findByEnabled(boolean enabled) {
-		log.info("Service: returning entities"+(enabled?"enabled":"not enabled"));
-		return findByEnabled(enabled);
+		
+		return Optional.ofNullable((repository.findByName(name)));
 	}
 
 	@Override
 	public JustAEntity save(JustAEntity entity) {
 		log.info("Service: persisting a entity: "+entity.toString());
+		
 		return repository.save(entity);
 	}
 

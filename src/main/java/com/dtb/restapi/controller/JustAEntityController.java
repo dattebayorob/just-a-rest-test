@@ -6,7 +6,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -38,26 +37,30 @@ public class JustAEntityController {
 	private static final Log log = LogFactory.getLog(JustAEntityController.class);
 
 	private static final String RESOURCE_NOT_FOUND_MSG = "There is no entity for the id ";
+	private static final String PAGE_NOT_FOUND = "There is no entities for this filter.";
 
 	@GetMapping
 	public ResponseEntity<Response> findAll(Pageable pageable) {
 		log.info("Controller: Returning a response with paginated entities");
-		Page<JustAEntity> entities = service.findAll(pageable);
-		return ResponseEntity.ok(Response.data(entities.map(entity -> modelMapper.map(entity, JustAEntityDto.class))));
+		
+		return ResponseEntity.ok(
+				Response.data(service.findAll(pageable).map(p -> p.map(e -> modelMapper.map(e, JustAEntityDto.class)))
+						.orElseThrow(() -> new ResourceNotFoundException(PAGE_NOT_FOUND))));
 	}
 
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<Response> findById(@PathVariable("id") Long id) {
 		log.info("Controller: Returning a response of a entity dto");
-		Optional<JustAEntity> entity = service.findById(id);
+
 		return ResponseEntity.ok(Response.data(
-				modelMapper.map(entity.orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND_MSG + id)),
-						JustAEntityDto.class)));
+				service.findById(id).map(e -> modelMapper.map(e, JustAEntityDto.class))
+				.orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND_MSG + id))));
 	}
 
 	@PostMapping
 	public ResponseEntity<Response> save(@Validated @RequestBody JustAEntityDto dto) {
 		log.info("Controller: Persisting a entity and returning a response of its dto");
+
 		return ResponseEntity.ok(Response
 				.data(modelMapper.map(service.save(modelMapper.map(dto, JustAEntity.class)), JustAEntityDto.class)));
 	}
@@ -66,6 +69,7 @@ public class JustAEntityController {
 	public ResponseEntity<Response> updateById(@PathVariable("id") Long id,
 			@Validated @RequestBody JustAEntityDto dto) {
 		log.info("Controller: Updating a entity and returning a response of its dto");
+
 		Optional<JustAEntity> entity = service.findById(id);
 		dto.setId(id);
 		modelMapper.map(modelMapper.map(dto, JustAEntity.class),
@@ -77,6 +81,7 @@ public class JustAEntityController {
 	public ResponseEntity<?> deleteById(@PathVariable("id") Long id) {
 		if (!service.findById(id).isPresent())
 			throw new ResourceNotFoundException(RESOURCE_NOT_FOUND_MSG + id);
+
 		service.deleteById(id);
 		return ResponseEntity.noContent().build();
 	}

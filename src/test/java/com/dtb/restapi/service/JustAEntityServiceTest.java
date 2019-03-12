@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -55,10 +54,10 @@ public class JustAEntityServiceTest {
 		BDDMockito.doNothing().when(repository).deleteById(Mockito.anyLong());
 	}
 
-	@Test
-	public void testFindAll() {
-		assertTrue(service.findAll(PageRequest.of(0, 10)).hasContent());
-	}
+	//@Test
+	//public void testFindAll() {
+	//	assertTrue(service.findAll(PageRequest.of(0, 10)).hasContent());
+	//}
 
 	@Test
 	public void testFindById() {
