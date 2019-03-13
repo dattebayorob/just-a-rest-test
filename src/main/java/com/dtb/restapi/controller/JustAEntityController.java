@@ -1,11 +1,10 @@
 package com.dtb.restapi.controller;
 
-import java.util.Optional;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
 import com.dtb.restapi.model.exceptions.ResourceNotFoundException;
+import com.dtb.restapi.model.exceptions.messages.ErrorMessages;
 import com.dtb.restapi.model.response.Response;
 import com.dtb.restapi.service.JustAEntityService;
 
@@ -36,33 +36,35 @@ public class JustAEntityController {
 
 	private static final Log log = LogFactory.getLog(JustAEntityController.class);
 
-	private static final String RESOURCE_NOT_FOUND_MSG = "There is no entity for the id ";
-	private static final String PAGE_NOT_FOUND = "There is no entities for this filter.";
-
 	@GetMapping
 	public ResponseEntity<Response> findAll(Pageable pageable) {
 		log.info("Controller: Returning a response with paginated entities");
-		
-		return ResponseEntity.ok(
-				Response.data(service.findAll(pageable).map(p -> p.map(e -> modelMapper.map(e, JustAEntityDto.class)))
-						.orElseThrow(() -> new ResourceNotFoundException(PAGE_NOT_FOUND))));
+
+		Page<JustAEntity> entities = service.findAll(pageable)
+				.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.PAGE_NOT_FOUND));
+
+		return ResponseEntity.ok(Response.data(entities.map(e -> modelMapper.map(e, JustAEntityDto.class))));
 	}
 
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<Response> findById(@PathVariable("id") Long id) {
 		log.info("Controller: Returning a response of a entity dto");
 
-		return ResponseEntity.ok(Response.data(
-				service.findById(id).map(e -> modelMapper.map(e, JustAEntityDto.class))
-				.orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND_MSG + id))));
+		JustAEntity entity = service.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.ENTITY_NOT_FOUND + id));
+
+		return ResponseEntity.ok(Response.data(modelMapper.map(entity, JustAEntityDto.class)));
 	}
 
 	@PostMapping
 	public ResponseEntity<Response> save(@Validated @RequestBody JustAEntityDto dto) {
 		log.info("Controller: Persisting a entity and returning a response of its dto");
 
-		return ResponseEntity.ok(Response
-				.data(modelMapper.map(service.save(modelMapper.map(dto, JustAEntity.class)), JustAEntityDto.class)));
+		JustAEntity entity = modelMapper.map(dto, JustAEntity.class);
+
+		return ResponseEntity.ok(service.save(entity).fold(Response::error,
+				e -> Response.data(modelMapper.map(e, JustAEntityDto.class))));
+
 	}
 
 	@PutMapping(value = "/{id}")
@@ -70,17 +72,18 @@ public class JustAEntityController {
 			@Validated @RequestBody JustAEntityDto dto) {
 		log.info("Controller: Updating a entity and returning a response of its dto");
 
-		Optional<JustAEntity> entity = service.findById(id);
+		JustAEntity entity = service.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.ENTITY_NOT_FOUND + id));
 		dto.setId(id);
-		modelMapper.map(modelMapper.map(dto, JustAEntity.class),
-				entity.orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOT_FOUND_MSG + id)));
-		return ResponseEntity.ok(Response.data(modelMapper.map(service.save(entity.get()), JustAEntityDto.class)));
+
+		return ResponseEntity.ok(service.update(modelMapper.map(dto, JustAEntity.class), entity.getName())
+				.fold(Response::error, e -> Response.data(modelMapper.map(e, JustAEntityDto.class))));
 	}
 
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<?> deleteById(@PathVariable("id") Long id) {
 		if (!service.findById(id).isPresent())
-			throw new ResourceNotFoundException(RESOURCE_NOT_FOUND_MSG + id);
+			throw new ResourceNotFoundException(ErrorMessages.ENTITY_NOT_FOUND + id);
 
 		service.deleteById(id);
 		return ResponseEntity.noContent().build();

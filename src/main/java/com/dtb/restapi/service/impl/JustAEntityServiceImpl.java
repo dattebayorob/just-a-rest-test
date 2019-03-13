@@ -1,6 +1,5 @@
 package com.dtb.restapi.service.impl;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.logging.Log;
@@ -11,47 +10,58 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.dtb.restapi.model.entities.JustAEntity;
+import com.dtb.restapi.model.exceptions.ValidationErrorException;
+import com.dtb.restapi.model.exceptions.messages.ErrorMessages;
 import com.dtb.restapi.model.repositories.JustAEntityRepository;
 import com.dtb.restapi.service.JustAEntityService;
 
+import io.vavr.control.Either;
+
 @Service
-public class JustAEntityServiceImpl implements JustAEntityService{
+public class JustAEntityServiceImpl implements JustAEntityService {
 	@Autowired
 	private JustAEntityRepository repository;
 	private static final Log log = LogFactory.getLog(JustAEntityServiceImpl.class);
-	
+
 	@Override
-	public Optional<Page<JustAEntity>> findAll(Pageable pageable){
+	public Optional<Page<JustAEntity>> findAll(Pageable pageable) {
 		log.info("Service: returning all entities paginateds");
-		
+
 		return Optional.of(repository.findAll(pageable)).filter(e -> !e.isEmpty());
 	}
-	
+
 	@Override
 	public Optional<JustAEntity> findById(Long id) {
-		log.info("Service: returning entity by id: "+id);
-		
+		log.info("Service: returning entity by id: " + id);
+
 		return repository.findById(id);
 	}
 
 	@Override
-	public Optional<List<JustAEntity>> findByName(String name) {
-		log.info("Service: returning entities by name: "+name);
+	public Either<RuntimeException, JustAEntity> save(JustAEntity entity) {
+		log.info("Service: persisting a entity: " + entity.toString());
+
+		if (repository.existsByName(entity.getName()))
+			return Either.left(new ValidationErrorException(ErrorMessages.ENTITY_NAME_UNIQUE));
 		
-		return Optional.ofNullable((repository.findByName(name)));
+		return Either.right(repository.save(entity));
 	}
 
 	@Override
-	public JustAEntity save(JustAEntity entity) {
-		log.info("Service: persisting a entity: "+entity.toString());
-		
-		return repository.save(entity);
-	}
+	public Either<RuntimeException, JustAEntity> update(JustAEntity entity, String name) {
+		log.info("Service: Updating a entity: " + entity.toString());
 
+		if ( ! entity.getName().equals(name) && repository.existsByName(entity.getName()))
+			return Either.left(new ValidationErrorException(ErrorMessages.ENTITY_NAME_UNIQUE));
+		
+		return Either.right(repository.save(entity));
+	}
+	
 	@Override
 	public void deleteById(Long id) {
-		log.info("Service: deleting a entity of id: "+id);
-		repository.deleteById(id);
+		log.info("Service: deleting a entity of id: " + id);
 		
+		repository.deleteById(id);
+
 	}
 }
