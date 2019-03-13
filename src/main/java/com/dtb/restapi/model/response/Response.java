@@ -35,6 +35,10 @@ public class Response {
 		return new Response(e);
 
 	}
+	
+	public static Response error(RuntimeException e) {
+		throw e;
+	}
 
 	public Object getData() {
 		return data;
