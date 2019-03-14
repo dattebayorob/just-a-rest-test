@@ -23,6 +23,7 @@ import com.dtb.restapi.model.entities.JustAEntity;
 import com.dtb.restapi.model.exceptions.ResourceNotFoundException;
 import com.dtb.restapi.model.exceptions.messages.ErrorMessages;
 import com.dtb.restapi.model.response.Response;
+import com.dtb.restapi.model.response.ResponseBuilder;
 import com.dtb.restapi.service.JustAEntityService;
 
 @RestController
@@ -43,7 +44,8 @@ public class JustAEntityController {
 		Page<JustAEntity> entities = service.findAll(pageable)
 				.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.PAGE_NOT_FOUND));
 
-		return ResponseEntity.ok(Response.data(entities.map(e -> modelMapper.map(e, JustAEntityDto.class))));
+		return ResponseEntity
+				.ok(new ResponseBuilder().input(entities).output(JustAEntityDto.class).dto());
 	}
 
 	@GetMapping(value = "/{id}")
@@ -53,7 +55,8 @@ public class JustAEntityController {
 		JustAEntity entity = service.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.ENTITY_NOT_FOUND + id));
 
-		return ResponseEntity.ok(Response.data(modelMapper.map(entity, JustAEntityDto.class)));
+		return ResponseEntity
+				.ok(new ResponseBuilder().input(entity).output(JustAEntityDto.class).dto());
 	}
 
 	@PostMapping
@@ -63,7 +66,7 @@ public class JustAEntityController {
 		JustAEntity entity = modelMapper.map(dto, JustAEntity.class);
 
 		return ResponseEntity.ok(service.save(entity).fold(Response::error,
-				e -> Response.data(modelMapper.map(e, JustAEntityDto.class))));
+				e -> new ResponseBuilder().input(e).output(JustAEntityDto.class).dto()));
 
 	}
 
@@ -76,8 +79,9 @@ public class JustAEntityController {
 				.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.ENTITY_NOT_FOUND + id));
 		dto.setId(id);
 
-		return ResponseEntity.ok(service.update(modelMapper.map(dto, JustAEntity.class), entity.getName())
-				.fold(Response::error, e -> Response.data(modelMapper.map(e, JustAEntityDto.class))));
+		return ResponseEntity
+				.ok(service.update(modelMapper.map(dto, JustAEntity.class), entity.getName()).fold(Response::error,
+						e -> new ResponseBuilder().input(e).output(JustAEntityDto.class).dto()));
 	}
 
 	@DeleteMapping(value = "/{id}")

@@ -1,6 +1,7 @@
 package com.dtb.restapi.model.response;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.validation.ObjectError;
@@ -23,19 +24,18 @@ public class Response {
 	public static Response data(Object data) {
 		return new Response(data);
 	}
-	
+
 	public static Response error(ObjectError error) {
-		List<String> e = new ArrayList<>();
-		e.add(error.getDefaultMessage());
-		return new Response(e);
+		return new Response(Arrays.asList(error));
 	}
+
 	public static Response error(List<ObjectError> errors) {
 		List<String> e = new ArrayList<>();
 		errors.forEach(error -> e.add(error.getDefaultMessage()));
 		return new Response(e);
 
 	}
-	
+
 	public static Response error(RuntimeException e) {
 		throw e;
 	}
