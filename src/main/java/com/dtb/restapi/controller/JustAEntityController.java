@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -92,7 +93,7 @@ public class JustAEntityController {
 
 		return ResponseEntity.ok(service.update(
 				(JustAEntity) converter
-					.entity(entity)
+					.dto(dto)
 					.toEntity(JustAEntity.class)
 					.convert()
 					, entity.getName()).fold(ResponseError::ex,
@@ -103,13 +104,12 @@ public class JustAEntityController {
 		));
 	}
 	
-	/*
 	@DeleteMapping(value = "/{id}")
-	public ResponseEntity deleteById(@PathVariable("id") Long id) {
+	public ResponseEntity<Response> deleteById(@PathVariable("id") Long id) {
 		if (!service.findById(id).isPresent())
 			throw new ResourceNotFoundException(ErrorMessages.ENTITY_NOT_FOUND + id);
 
 		service.deleteById(id);
 		return ResponseEntity.noContent().build();
-	}*/
+	}
 }
