@@ -72,10 +72,10 @@ public class JustAEntityController {
 		JustAEntity entity = (JustAEntity) converter.dto(dto).toEntity(JustAEntity.class).convert();
 
 		return ResponseEntity.ok(service.save(entity).fold(ResponseError::ex,
-				e -> converter
+				e -> new ResponseData(converter
 				.entity(e)
 				.toDto(JustAEntityDto.class)
-				.convert()
+				.convert())
 		));
 
 	}
@@ -95,10 +95,10 @@ public class JustAEntityController {
 					.toEntity(JustAEntity.class)
 					.convert()
 					, entity.getName()).fold(ResponseError::ex,
-				e -> converter
+				e -> new ResponseData(converter
 				.entity(e)
 				.toDto(JustAEntityDto.class)
-				.convert()
+				.convert())
 		));
 	}
 	
