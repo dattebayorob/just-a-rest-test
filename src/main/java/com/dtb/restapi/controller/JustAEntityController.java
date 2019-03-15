@@ -21,6 +21,7 @@ import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
 import com.dtb.restapi.model.exceptions.ResourceNotFoundException;
 import com.dtb.restapi.model.exceptions.messages.ErrorMessages;
+import com.dtb.restapi.model.response.Response;
 import com.dtb.restapi.model.response.ResponseData;
 import com.dtb.restapi.model.response.ResponseError;
 import com.dtb.restapi.service.JustAEntityService;
@@ -37,7 +38,7 @@ public class JustAEntityController {
 	private static final Log log = LogFactory.getLog(JustAEntityController.class);
 
 	@GetMapping
-	public ResponseEntity<?> findAll(Pageable pageable) {
+	public ResponseEntity<Response> findAll(Pageable pageable) {
 		log.info("Controller: Returning a response with paginated entities");
 
 		Page<JustAEntity> entities = service.findAll(pageable)
@@ -52,7 +53,7 @@ public class JustAEntityController {
 	}
 
 	@GetMapping(value = "/{id}")
-	public ResponseEntity findById(@PathVariable("id") Long id) {
+	public ResponseEntity<Response> findById(@PathVariable("id") Long id) {
 		log.info("Controller: Returning a response of a entity dto");
 
 		JustAEntity entity = service.findById(id)
@@ -66,7 +67,7 @@ public class JustAEntityController {
 	}
 
 	@PostMapping
-	public ResponseEntity save(@Validated @RequestBody JustAEntityDto dto) {
+	public ResponseEntity<Response> save(@Validated @RequestBody JustAEntityDto dto) {
 		log.info("Controller: Persisting a entity and returning a response of its dto");
 
 		JustAEntity entity = (JustAEntity) converter.dto(dto).toEntity(JustAEntity.class).convert();
@@ -81,7 +82,7 @@ public class JustAEntityController {
 	}
 
 	@PutMapping(value = "/{id}")
-	public ResponseEntity updateById(@PathVariable("id") Long id, @Validated @RequestBody JustAEntityDto dto) {
+	public ResponseEntity<Response> updateById(@PathVariable("id") Long id, @Validated @RequestBody JustAEntityDto dto) {
 		log.info("Controller: Updating a entity and returning a response of its dto");
 
 		JustAEntity entity = service.findById(id)

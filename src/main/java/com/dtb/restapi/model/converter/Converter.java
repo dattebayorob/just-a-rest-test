@@ -11,22 +11,22 @@ public class Converter<E, D> {
 	private E entity;
 	private D dto;
 
-	public Converter entity(E entity) {
+	public Converter<E, D> entity(E entity) {
 		this.entity = entity;
 		return this;
 	}
 
-	public Converter dto(D dto) {
+	public Converter<E, D> dto(D dto) {
 		this.dto = dto;
 		return this;
 	}
 
-	public Converter toDto(Class<D> cls) {
+	public Converter<E, D> toDto(Class<D> cls) {
 		dto = map.map(entity, cls);
 		return this;
 	}
 
-	public Converter toEntity(Class<E> cls) {
+	public Converter<E, D> toEntity(Class<E> cls) {
 		entity = map.map(dto, cls);
 		return this;
 	}
