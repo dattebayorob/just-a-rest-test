@@ -1,38 +1,19 @@
 package com.dtb.restapi.model.converter;
 
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.dtb.restapi.model.response.ResponseData;
 
-@Component
-public class Converter<E, D> {
-	@Autowired
-	private ModelMapper map;
-	private E entity;
-	private D dto;
+public interface Converter<E, D> {
+	
+	public Converter<E, D> entity(E entity);
 
-	public Converter<E, D> entity(E entity) {
-		this.entity = entity;
-		return this;
-	}
+	public Converter<E, D> dto(D dto);
 
-	public Converter<E, D> dto(D dto) {
-		this.dto = dto;
-		return this;
-	}
+	public Converter<E, D> toDto(Class<D> cls) ;
 
-	public Converter<E, D> toDto(Class<D> cls) {
-		dto = map.map(entity, cls);
-		return this;
-	}
+	public Converter<E, D> toEntity(Class <E> cls);
 
-	public Converter<E, D> toEntity(Class<E> cls) {
-		entity = map.map(dto, cls);
-		return this;
-	}
-
-	public Object convert() {
-		return entity == null ? dto : entity;
-	}
+	public Object convert();
+	
+	public ResponseData toResponse();
 
 }

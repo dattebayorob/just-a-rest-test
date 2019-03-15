@@ -46,7 +46,7 @@ public class JustAEntityController {
 				.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.PAGE_NOT_FOUND));
 
 		return ResponseEntity
-				.ok(new ResponseData(entities.map(e -> converter
+				.ok(ResponseData.data(entities.map(e -> converter
 						.entity(e)
 						.toDto(JustAEntityDto.class)
 						.convert()
@@ -60,11 +60,11 @@ public class JustAEntityController {
 		JustAEntity entity = service.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.ENTITY_NOT_FOUND + id));
 
-		return ResponseEntity.ok(new ResponseData(converter
+		return ResponseEntity.ok(converter
 				.entity(entity)
 				.toDto(JustAEntityDto.class)
-				.convert()
-				));
+				.toResponse()
+				);
 	}
 
 	@PostMapping
@@ -74,10 +74,10 @@ public class JustAEntityController {
 		JustAEntity entity = (JustAEntity) converter.dto(dto).toEntity(JustAEntity.class).convert();
 
 		return ResponseEntity.ok(service.save(entity).fold(ResponseError::ex,
-				e -> new ResponseData(converter
+				e -> converter
 				.entity(e)
 				.toDto(JustAEntityDto.class)
-				.convert())
+				.toResponse()
 		));
 
 	}
@@ -97,10 +97,10 @@ public class JustAEntityController {
 					.toEntity(JustAEntity.class)
 					.convert()
 					, entity.getName()).fold(ResponseError::ex,
-				e -> new ResponseData(converter
+				e -> converter
 				.entity(e)
 				.toDto(JustAEntityDto.class)
-				.convert())
+				.toResponse()
 		));
 	}
 	
