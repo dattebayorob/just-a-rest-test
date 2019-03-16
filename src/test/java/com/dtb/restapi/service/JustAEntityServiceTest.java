@@ -4,8 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.apache.commons.logging.Log;
@@ -22,6 +21,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.dtb.restapi.model.builders.JustAEntityBuilder;
 import com.dtb.restapi.model.entities.JustAEntity;
 import com.dtb.restapi.model.repositories.JustAEntityRepository;
 
@@ -39,36 +39,29 @@ public class JustAEntityServiceTest {
 	@Before
 	public void init() {
 		log.info("Repository Test: Setup entity");
-		entity = new JustAEntity();
-		entity.setId(Long.valueOf(1));
-		entity.setName("Just a Name");
-		entity.setEnabled(true);
-		List<JustAEntity> entities = new ArrayList<JustAEntity>() {
-			{
-				add(entity);
-			}
-		};
-		BDDMockito.given(repository.findAll(Mockito.any(Pageable.class))).willReturn(new PageImpl<>(entities));
+		entity = JustAEntityBuilder.builder().name("Just a Name").enabled(true).build();
+		BDDMockito.given(repository.findAll(Mockito.any(Pageable.class)))
+				.willReturn(new PageImpl<>(Arrays.asList(entity)));
 		BDDMockito.given(repository.save(Mockito.any(JustAEntity.class))).willReturn(entity);
 		BDDMockito.given(repository.findById(Mockito.anyLong())).willReturn(Optional.of(entity));
 		BDDMockito.doNothing().when(repository).deleteById(Mockito.anyLong());
 	}
 
-	//@Test
-	//public void testFindAll() {
-	//	assertTrue(service.findAll(PageRequest.of(0, 10)).hasContent());
-	//}
+	// @Test
+	// public void testFindAll() {
+	// assertTrue(service.findAll(PageRequest.of(0, 10)).hasContent());
+	// }
 
 	@Test
 	public void testFindById() {
 		assertTrue(service.findById(Long.valueOf(1)).isPresent());
 	}
-	
+
 	@Test
 	public void testSave() {
 		assertNotNull(service.save(entity));
 	}
-	
+
 	@Test
 	public void testDeleteById() {
 		BDDMockito.given(repository.findById(Mockito.anyLong())).willReturn(Optional.ofNullable(null));
