@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dtb.restapi.model.converter.Converter;
+import com.dtb.restapi.model.converter.impl.GenericConverter;
 import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
 import com.dtb.restapi.model.exceptions.ResourceNotFoundException;
@@ -34,7 +34,7 @@ public class JustAEntityController {
 	@Autowired
 	private JustAEntityService service;
 	@Autowired
-	private Converter<JustAEntity, JustAEntityDto> converter;
+	private GenericConverter<JustAEntity, JustAEntityDto> converter;
 
 	private static final Log log = LogFactory.getLog(JustAEntityController.class);
 
@@ -45,12 +45,7 @@ public class JustAEntityController {
 		Page<JustAEntity> entities = service.findAll(pageable)
 				.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.PAGE_NOT_FOUND));
 
-		return ResponseEntity
-				.ok(ResponseData.data(entities.map(e -> converter
-						.entity(e)
-						.toDto(JustAEntityDto.class)
-						.convert()
-						)));
+		return ResponseEntity.ok(ResponseData.data(converter.toDto(JustAEntityDto.class).convert(entities)));
 	}
 
 	@GetMapping(value = "/{id}")
@@ -60,50 +55,34 @@ public class JustAEntityController {
 		JustAEntity entity = service.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.ENTITY_NOT_FOUND + id));
 
-		return ResponseEntity.ok(converter
-				.entity(entity)
-				.toDto(JustAEntityDto.class)
-				.toResponse()
-				);
+		return ResponseEntity.ok(ResponseData.data(converter.toDto(JustAEntityDto.class).convert(entity)));
 	}
 
 	@PostMapping
 	public ResponseEntity<Response> save(@Validated @RequestBody JustAEntityDto dto) {
 		log.info("Controller: Persisting a entity and returning a response of its dto");
 
-		JustAEntity entity = (JustAEntity) converter.dto(dto).toEntity(JustAEntity.class).convert();
+		JustAEntity entity = converter.toEntity(JustAEntity.class).convert(dto);
 
-		return ResponseEntity.ok(service.save(entity).fold(ResponseError::ex,
-				e -> converter
-				.entity(e)
-				.toDto(JustAEntityDto.class)
-				.toResponse()
-		));
-
+		return ResponseEntity.ok(ResponseData.data(
+				service.save(entity).fold(ResponseError::ex, e -> converter.toDto(JustAEntityDto.class).convert(e))));
 	}
 
 	@PutMapping(value = "/{id}")
-	public ResponseEntity<Response> updateById(@PathVariable("id") Long id, @Validated @RequestBody JustAEntityDto dto) {
+	public ResponseEntity<Response> updateById(@PathVariable("id") Long id,
+			@Validated @RequestBody JustAEntityDto dto) {
 		log.info("Controller: Updating a entity and returning a response of its dto");
 
 		JustAEntity entity = service.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.ENTITY_NOT_FOUND + id));
-		
+
 		dto.setId(id);
 
-		return ResponseEntity.ok(service.update(
-				(JustAEntity) converter
-					.dto(dto)
-					.toEntity(JustAEntity.class)
-					.convert()
-					, entity.getName()).fold(ResponseError::ex,
-				e -> converter
-				.entity(e)
-				.toDto(JustAEntityDto.class)
-				.toResponse()
-		));
+		return ResponseEntity.ok(
+				ResponseData.data(service.update(converter.toEntity(JustAEntity.class).convert(dto), entity.getName())
+						.fold(ResponseError::ex, e -> converter.toDto(JustAEntityDto.class).convert(e))));
 	}
-	
+
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<Response> deleteById(@PathVariable("id") Long id) {
 		if (!service.findById(id).isPresent())
