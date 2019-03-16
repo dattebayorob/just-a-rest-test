@@ -1,23 +1,9 @@
 package com.dtb.restapi.model.converter;
 
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Page;
-
-public interface Converter<T, R> extends Function<T, R> {
-
-	default R convert(final T input) {
-		return this.apply(input);
-	}
-
-	default List<R> convert(final List<T> input) {
-		return input.stream().map(this::apply).collect(Collectors.toList());
-	}
+public interface Converter<E,D> {
 	
-	default Page<R> convert(final Page<T> input) {
-		return input.map(this::apply);
-	}
-
+	public Convert<E, D> toDto(Class<D> cls);
+	
+	public Convert<D, E> toEntity(Class<E> cls);
+	
 }
