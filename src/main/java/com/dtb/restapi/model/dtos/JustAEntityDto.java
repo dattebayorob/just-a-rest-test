@@ -9,7 +9,7 @@ public class JustAEntityDto {
 	@Size(min = 3, max = 255, message = "Its just a Entity, but needs at lest 3 caracteres!")
 	private String name;
 	@NotNull(message = "Its just a Entity, but needs to be seted as enabled or not!")
-	private boolean enabled;
+	private Boolean enabled;
 	public Long getId() {
 		return id;
 	}
@@ -25,7 +25,7 @@ public class JustAEntityDto {
 	public boolean isEnabled() {
 		return enabled;
 	}
-	public void setEnabled(boolean enabled) {
+	public void setEnabled(Boolean enabled) {
 		this.enabled = enabled;
 	}
 	
