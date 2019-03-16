@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.dtb.restapi.model.converter.impl.GenericConverter;
+import com.dtb.restapi.model.converter.Converter;
 import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
 import com.dtb.restapi.model.exceptions.ResourceNotFoundException;
@@ -34,7 +34,7 @@ public class JustAEntityController {
 	@Autowired
 	private JustAEntityService service;
 	@Autowired
-	private GenericConverter<JustAEntity, JustAEntityDto> converter;
+	private Converter<JustAEntity, JustAEntityDto> converter;
 
 	private static final Log log = LogFactory.getLog(JustAEntityController.class);
 
