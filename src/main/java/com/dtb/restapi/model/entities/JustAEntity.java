@@ -7,8 +7,13 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.Builder;
+import lombok.Data;
+
 @Entity
 @Table(name = "entity")
+@Builder
+@Data
 public class JustAEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,24 +22,6 @@ public class JustAEntity {
 	private String name;
 	@Column(name = "enabled", nullable = false)
 	private boolean enabled;
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public boolean isEnabled() {
-		return enabled;
-	}
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
 	
 	
 }

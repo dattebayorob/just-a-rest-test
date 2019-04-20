@@ -4,7 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,15 +39,13 @@ public class JustAEntityServiceTest {
 	@Before
 	public void init() {
 		log.info("Repository Test: Setup entity");
-		entity = new JustAEntity();
-		entity.setId(Long.valueOf(1));
-		entity.setName("Just a Name");
-		entity.setEnabled(true);
-		List<JustAEntity> entities = new ArrayList<JustAEntity>() {
-			{
-				add(entity);
-			}
-		};
+		entity = JustAEntity
+				.builder()
+					.id(Long.valueOf(1))
+					.name("Just a Name")
+					.enabled(true)
+					.build();
+		List<JustAEntity> entities = Arrays.asList(entity);
 		BDDMockito.given(repository.findAll(Mockito.any(Pageable.class))).willReturn(new PageImpl<>(entities));
 		BDDMockito.given(repository.save(Mockito.any(JustAEntity.class))).willReturn(entity);
 		BDDMockito.given(repository.findById(Mockito.anyLong())).willReturn(Optional.of(entity));

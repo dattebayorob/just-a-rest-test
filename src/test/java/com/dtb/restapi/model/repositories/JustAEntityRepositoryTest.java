@@ -29,9 +29,9 @@ public class JustAEntityRepositoryTest {
 	@Before
 	public void init() {
 		log.info("Repository Test: Setup entity");
-		entity = new JustAEntity();
-		entity.setName("Just a Name");
-		entity.setEnabled(true);
+		entity = JustAEntity.builder()
+				.name("Just a Name")
+				.enabled(true).build();
 		repository.save(entity);
 	}
 
