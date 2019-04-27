@@ -1,5 +1,7 @@
 	package com.dtb.restapi.controller;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,10 +51,12 @@ public class JustAEntityController {
 	}
 
 	@PostMapping
-	public ResponseEntity<JustAEntityDto> save(@Validated @RequestBody JustAEntityDto dto) {
+	public ResponseEntity<JustAEntityDto> save(@Validated @RequestBody JustAEntityDto dto, HttpServletResponse response) {
 		log.info("Controller: Persisting entity {}", dto);
 
-		dto = service.save(dto);
+		dto = service.save(dto,response);
+		
+		
 
 		return ResponseEntity.ok(dto);
 

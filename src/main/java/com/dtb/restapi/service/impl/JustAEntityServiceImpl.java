@@ -3,7 +3,10 @@ package com.dtb.restapi.service.impl;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.dtb.restapi.model.converters.EntityDtoConverter;
 import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
+import com.dtb.restapi.model.events.CreatedResourceEvent;
 import com.dtb.restapi.model.exceptions.ResourceNotFoundException;
 import com.dtb.restapi.model.exceptions.ValidationErrorException;
 import com.dtb.restapi.model.exceptions.messages.ErrorMessages;
@@ -26,6 +30,8 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 	private JustAEntityRepository repository;
 	@Autowired
 	private EntityDtoConverter converter;
+	@Autowired
+	private ApplicationEventPublisher publisher;
 
 	@Override
 	public Page<JustAEntityDto> findAll(Pageable pageable) {
@@ -48,17 +54,20 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 	}
 
 	@Override
-	public JustAEntityDto save(JustAEntityDto dto) {
+	public JustAEntityDto save(JustAEntityDto dto, HttpServletResponse response) {
 		log.info("Service: persisting a entity: " + dto);
 		
 		
 		if(repository.existsByName(dto.getName()))
 			throw new ValidationErrorException(ErrorMessages.ENTITY_NAME_UNIQUE);
 		
-		return Optional
-				.of(repository.save(converter.toEntity(dto)))
-				.map(converter::toDto)
-				.get();
+//		return Optional
+//				.of(repository.save(converter.toEntity(dto)))
+//				.map(converter::toDto)
+//				.get();
+		JustAEntity entity = repository.save(converter.toEntity(dto));
+		publisher.publishEvent(new CreatedResourceEvent(this, response, entity.getId()));
+		return converter.toDto(entity);
 	}
 
 	@Override
