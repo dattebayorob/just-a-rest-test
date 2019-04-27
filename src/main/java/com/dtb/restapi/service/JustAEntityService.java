@@ -1,23 +1,20 @@
 package com.dtb.restapi.service;
 
-import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
-
-import io.vavr.control.Either;
 
 public interface JustAEntityService {
 	
-	Optional<Page<JustAEntity>> findAll(Pageable pageable);
+	Page<JustAEntityDto> findAll(Pageable pageable);
 	
-	Optional<JustAEntity> findById(Long id);
+	JustAEntityDto findById(Long id);
 	
-	Either<RuntimeException, JustAEntity> save(JustAEntity entity);
+	JustAEntityDto save(JustAEntityDto dto);
 	
-	Either<RuntimeException, JustAEntity> update(JustAEntity entity, String name);
+	JustAEntityDto update(JustAEntityDto dto);
 	
 	void deleteById(Long id);
 }

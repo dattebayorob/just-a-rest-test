@@ -10,13 +10,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.dtb.restapi.model.entities.JustAEntity;
 
 public interface JustAEntityRepository extends JpaRepository<JustAEntity, Long> {
-	Page<JustAEntity> findAll(Pageable pageable);
 
 	Optional<JustAEntity> findById(Long id);
 
 	List<JustAEntity> findByName(String name);
 
-	List<JustAEntity> findByEnabled(boolean enabled);
+	Page<JustAEntity> findByEnabled(boolean enabled,Pageable pageable);
 
 	boolean existsByName(String name);
 }

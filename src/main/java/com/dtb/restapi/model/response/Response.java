@@ -6,22 +6,13 @@ import java.util.List;
 import org.springframework.validation.ObjectError;
 
 public class Response {
-	private Object data;
 	private List<String> error;
 
 	public Response() {
 	}
 
-	public Response(Object data) {
-		this.data = data;
-	}
-
 	public Response(List<String> error) {
 		this.error = error;
-	}
-
-	public static Response data(Object data) {
-		return new Response(data);
 	}
 	
 	public static Response error(ObjectError error) {
@@ -38,14 +29,6 @@ public class Response {
 	
 	public static Response error(RuntimeException e) {
 		throw e;
-	}
-
-	public Object getData() {
-		return data;
-	}
-
-	public void setData(Object data) {
-		this.data = data;
 	}
 
 	public List<String> getError() {
