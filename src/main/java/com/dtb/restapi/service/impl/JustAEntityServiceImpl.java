@@ -56,7 +56,8 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 			throw new ValidationErrorException(ErrorMessages.ENTITY_NAME_UNIQUE);
 		
 		return Optional
-				.of(repository.save(converter.toEntity(dto)))
+				.of(converter.toEntity(dto))
+				.map(repository::save)
 				.map(converter::toDto)
 				.get();
 	}
