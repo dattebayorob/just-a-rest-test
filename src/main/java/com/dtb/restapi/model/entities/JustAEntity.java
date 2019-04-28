@@ -27,6 +27,10 @@ public class JustAEntity {
 	private Long id;
 	@Column(name = "name", nullable = false, length = 255)
 	private String name;
+	@Column(name = "cpf", nullable = false, unique = true)
+	private String cpf;
+	@Column(name = "rg", nullable = false, unique = true)
+	private String rg;
 	@Column(name = "enabled", nullable = false)
 	private boolean enabled;
 	@Column(name = "date", nullable = false)

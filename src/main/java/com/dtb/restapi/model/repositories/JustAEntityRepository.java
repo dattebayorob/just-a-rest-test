@@ -18,4 +18,6 @@ public interface JustAEntityRepository extends JpaRepository<JustAEntity, Long> 
 	Page<JustAEntity> findByEnabled(boolean enabled,Pageable pageable);
 
 	boolean existsByName(String name);
+	boolean existsByCpf(String cpf);
+	boolean existsByRg(String rg);
 }

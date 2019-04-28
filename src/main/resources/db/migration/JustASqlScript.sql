@@ -1,1 +1,1 @@
-INSERT INTO entity(name,date,enabled) VALUES('Just a Entity',CURRENT_TIME,true),('Just a Entity 2',CURRENT_TIME,true),('Just a Entity 3',CURRENT_TIME,false);
+INSERT INTO entity(name,cpf,rg,date,enabled) VALUES('Just a Entity','cpf1','rg1',CURRENT_TIME,true),('Just a Entity 2','cpf2','rg2',CURRENT_TIME,true),('Just a Entity 3','cpf3','rg3',CURRENT_TIME,false);
