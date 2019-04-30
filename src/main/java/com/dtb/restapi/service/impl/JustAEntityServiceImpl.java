@@ -1,9 +1,6 @@
 package com.dtb.restapi.service.impl;
 
-import static com.dtb.restapi.model.exceptions.messages.ErrorMessages.ENTITY_CPF_UNIQUE;
-import static com.dtb.restapi.model.exceptions.messages.ErrorMessages.ENTITY_NAME_UNIQUE;
 import static com.dtb.restapi.model.exceptions.messages.ErrorMessages.ENTITY_NOT_FOUND;
-import static com.dtb.restapi.model.exceptions.messages.ErrorMessages.ENTITY_RG_UNIQUE;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +30,7 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 	private JustAEntityRepository repository;
 	@Autowired
 	private EntityDtoConverter converter;
+	
 	private List<Error> errors;
 
 	@Override
@@ -103,11 +101,11 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 	private void validate(JustAEntityDto dto){
 		errors = new LinkedList<>();
 		if(repository.existsByName(dto.getName()))
-			errors.add(new Error("name", ENTITY_NAME_UNIQUE));
+			errors.add(new Error("name", "entity.name.unique"));
 		if(repository.existsByCpf(dto.getCpf()))
-			errors.add(new Error("cpf", ENTITY_CPF_UNIQUE));
+			errors.add(new Error("cpf", "entity.cpf.unique"));
 		if(repository.existsByRg(dto.getRg()))
-			errors.add(new Error("rg", ENTITY_RG_UNIQUE));
+			errors.add(new Error("rg", "entity.rg.unique"));
 		
 		if(!errors.isEmpty())
 			throw new ValidationErrorsException("Errors found on save", errors);
@@ -120,11 +118,11 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 		Predicate<JustAEntity> isRgUnique = e -> !e.getRg().equals(dto.getRg())&&repository.existsByRg(dto.getRg());
 		
 		if(isNameUnique.test(entity))
-			errors.add(new Error("name", ENTITY_NAME_UNIQUE));
+			errors.add(new Error("name", "entity.name.unique"));
 		if(isCpfUnique.test(entity))
-			errors.add(new Error("name",ENTITY_CPF_UNIQUE));
+			errors.add(new Error("cpf", "entity.cpf.unique"));
 		if(isRgUnique.test(entity))
-			errors.add(new Error("rg",ENTITY_RG_UNIQUE));
+			errors.add(new Error("rg", "entity.rg.unique"));
 		
 		if(!errors.isEmpty())
 			throw new ValidationErrorsException("Errors found on update", errors);

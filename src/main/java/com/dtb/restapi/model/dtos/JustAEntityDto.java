@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JustAEntityDto {
 	private Long id;
-	@NotEmpty(message = "Its just a Entity, but needs a name!")
+	@NotEmpty(message = "{entity.name.notnull}")
 	@Size(min = 3, max = 255, message = "Its just a Entity, but needs at lest 3 caracteres!")
 	private String name;
-	@NotEmpty(message = "Its just a Entity, but needs a cpf!")
+	@NotEmpty(message = "{entity.cpf.notnull}")
 	private String cpf;
-	@NotEmpty(message = "Its just a Entity, but needs a rg!")
+	@NotEmpty(message = "{entity.rg.notnull}")
 	private String rg;
 }
