@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.dtb.restapi.model.dtos.JustAEntityDto;
-import com.dtb.restapi.model.entities.JustAEntity;
 
 public interface JustAEntityService {
 	

@@ -1,20 +1,21 @@
 package com.dtb.restapi.model.exceptions;
 
-import java.util.Map;
+import java.util.List;
 
-import org.zalando.problem.AbstractThrowableProblem;
-import org.zalando.problem.Status;
+import lombok.Getter;
 
-public class ValidationErrors extends AbstractThrowableProblem {
+@Getter
+public class ValidationErrorsException extends RuntimeException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-
-	public ValidationErrors(Map<String, Object> parameters) {
-		super(null, null, Status.BAD_REQUEST, null, null, null, parameters);
+	private final List<Error> errors;
+	public ValidationErrorsException(String message, List<Error> errors) {
+		super(message);
+		this.errors = errors;
 	}
 
 }
