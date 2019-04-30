@@ -58,20 +58,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.vavr/vavr -->
 		<dependency>
-			<groupId>org.zalando</groupId>
-			<artifactId>problem</artifactId>
-			<version>0.22.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.zalando</groupId>
-			<artifactId>jackson-datatype-problem</artifactId>
-			<version>0.22.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.zalando</groupId>
-			<artifactId>problem-spring-web</artifactId>
-			<version>0.23.0</version>
+			<groupId>io.vavr</groupId>
+			<artifactId>vavr</artifactId>
+			<version>0.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -81,6 +72,11 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-rest</artifactId>
 		</dependency>
 	</dependencies>
 
