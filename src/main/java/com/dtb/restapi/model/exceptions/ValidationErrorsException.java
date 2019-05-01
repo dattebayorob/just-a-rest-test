@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.Getter;
 
 @Getter
-public class ValidationErrorsException extends Throwable {
+public class ValidationErrorsException extends RuntimeException {
 
 	/**
 	 * 

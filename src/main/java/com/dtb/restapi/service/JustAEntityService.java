@@ -1,15 +1,12 @@
 package com.dtb.restapi.service;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.dtb.restapi.model.dtos.JustAEntityDto;
-import com.dtb.restapi.model.exceptions.Error;
-
-import io.vavr.control.Either;
+import com.dtb.restapi.model.entities.JustAEntity;
 
 public interface JustAEntityService {
 	
@@ -17,9 +14,9 @@ public interface JustAEntityService {
 	
 	Optional<JustAEntityDto> findById(Long id);
 	
-	Either<List<Error>, JustAEntityDto> save(JustAEntityDto dto);
+	Optional<JustAEntityDto> save(JustAEntityDto dto);
 	
-	Either<List<Error>, JustAEntityDto> update(JustAEntityDto dto);
+	Optional<JustAEntityDto> update(JustAEntityDto dto);
 	
-	void deleteById(Long id);
+	Optional<JustAEntity> deleteById(Long id);
 }

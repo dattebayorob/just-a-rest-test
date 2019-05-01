@@ -1,9 +1,6 @@
 package com.dtb.restapi.model.response;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.validation.FieldError;
 
 import com.dtb.restapi.model.exceptions.Error;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -33,26 +30,5 @@ public class Response {
 
 	public static Response errors(List<Error> errors) {
 		return new Response(errors);
-	}
-
-	public static Response validation(List<FieldError> errors) {
-		return new Response(errors
-				.stream()
-				.map(error -> {
-					return new Error(
-							error.getField(),
-							error.getDefaultMessage());
-				})
-				.collect(Collectors.toList()));
-	}
-	
-	public static Response exception(RuntimeException e) {
-		throw e;
-	}
-
-	public Boolean isData() {
-		if(errors == null)
-			return true;
-		return errors.isEmpty();
 	}
 }
