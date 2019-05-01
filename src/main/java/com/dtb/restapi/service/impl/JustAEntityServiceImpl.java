@@ -17,10 +17,10 @@ import com.dtb.restapi.model.converters.EntityDtoConverter;
 import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
 import com.dtb.restapi.model.exceptions.Error;
-import com.dtb.restapi.model.exceptions.ValidationErrorsException;
 import com.dtb.restapi.model.repositories.JustAEntityRepository;
 import com.dtb.restapi.service.JustAEntityService;
 
+import io.vavr.control.Either;
 import lombok.extern.log4j.Log4j2;
 
 @Service
@@ -43,46 +43,52 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 	}
 
 	@Override
-	public JustAEntityDto findById(Long id) {
+	public Optional<JustAEntityDto> findById(Long id) {
 		log.info("Service: returning entity by id: " + id);
 
 		return repository
 				.findById(id)
 				.filter(JustAEntity::isEnabled)
-				.map(converter::toDto)
-				.orElseThrow(() -> new ResourceNotFoundException(ENTITY_NOT_FOUND));
+				.map(converter::toDto);
 	}
 
 	@Override
-	public JustAEntityDto save(JustAEntityDto dto) {
+	public Either<List<Error>, JustAEntityDto> save(JustAEntityDto dto) {
 		log.info("Service: persisting a entity: " + dto);
 		
-		validate(dto);
+		if(validate(dto))
+			return Either.left(errors);
 		
-		return Optional
-				.of(converter.toEntity(dto))
+		return Either.right(
+				Optional
+				.ofNullable(converter.toEntity(dto))
 				.map(repository::save)
 				.map(converter::toDto)
-				.get();
+				.orElseThrow(() -> new RuntimeException("lala")));
 	}
 
 	@Override
-	public JustAEntityDto update(JustAEntityDto dto) {
+	public Either<List<Error>, JustAEntityDto> update(JustAEntityDto dto) {
 		log.info("Service: Updating a entity: " + dto);
+		Optional<JustAEntity> optional = repository.findById(dto.getId()).filter(JustAEntity::isEnabled);
 		
-		return repository
-				.findById(dto.getId())
-				.filter(JustAEntity::isEnabled)
+		if(!optional.isPresent())
+			throw new ResourceNotFoundException();
+		
+		if(validateUpdate(optional.get(), dto))
+			return Either.left(errors);
+		
+		return Either.right(
+				optional
 				.map(entity -> {
-					validateUpdate(entity,dto);
 					entity.setName(dto.getName());
 					entity.setCpf(dto.getCpf());
 					entity.setRg(dto.getRg());
 					repository.save(entity);
 					return entity;
-					})
+				})
 				.map(converter::toDto)
-				.orElseThrow(() ->  new ResourceNotFoundException(ENTITY_NOT_FOUND));
+				.get());
 	}
 	
 	@Override
@@ -98,7 +104,7 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 
 	}
 	
-	private void validate(JustAEntityDto dto){
+	private Boolean validate(JustAEntityDto dto){
 		errors = new LinkedList<>();
 		if(repository.existsByName(dto.getName()))
 			errors.add(new Error("name", "entity.name.unique"));
@@ -107,11 +113,10 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 		if(repository.existsByRg(dto.getRg()))
 			errors.add(new Error("rg", "entity.rg.unique"));
 		
-		if(!errors.isEmpty())
-			throw new ValidationErrorsException("Errors found on save", errors);
+		return !errors.isEmpty();
 	}
 	
-	private void validateUpdate(JustAEntity entity, JustAEntityDto dto){
+	private Boolean validateUpdate(JustAEntity entity, JustAEntityDto dto){
 		errors = new LinkedList<>();
 		Predicate<JustAEntity> isNameUnique = e -> !e.getName().equals(dto.getName())&&repository.existsByName(dto.getName());
 		Predicate<JustAEntity> isCpfUnique = e -> !e.getCpf().equals(dto.getCpf())&&repository.existsByCpf(dto.getCpf());
@@ -124,7 +129,6 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 		if(isRgUnique.test(entity))
 			errors.add(new Error("rg", "entity.rg.unique"));
 		
-		if(!errors.isEmpty())
-			throw new ValidationErrorsException("Errors found on update", errors);
+		return !errors.isEmpty();
 	}
 }
