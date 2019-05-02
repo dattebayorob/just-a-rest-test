@@ -14,7 +14,8 @@ import com.dtb.restapi.model.converters.EntityDtoConverter;
 import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
 import com.dtb.restapi.model.exceptions.Error;
-import com.dtb.restapi.model.exceptions.ValidationErrorsException;
+import com.dtb.restapi.model.exceptions.ResourceNotFoundException;
+import com.dtb.restapi.model.exceptions.ValidationException;
 import com.dtb.restapi.model.repositories.JustAEntityRepository;
 import com.dtb.restapi.service.JustAEntityService;
 
@@ -40,17 +41,18 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 	}
 
 	@Override
-	public Optional<JustAEntityDto> findById(Long id) {
+	public JustAEntityDto findById(Long id) {
 		log.info("Service: returning entity by id: " + id);
 
 		return repository
 				.findById(id)
 				.filter(JustAEntity::isEnabled)
-				.map(converter::toDto);
+				.map(converter::toDto)
+				.orElseThrow(() -> new ResourceNotFoundException(new Error("", "Not Found")));
 	}
 
 	@Override
-	public Optional<JustAEntityDto> save(JustAEntityDto dto){
+	public JustAEntityDto save(JustAEntityDto dto){
 		log.info("Service: persisting a entity: " + dto);
 		
 		validate(dto);
@@ -58,11 +60,12 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 		return Optional
 				.ofNullable(converter.toEntity(dto))
 				.map(repository::save)
-				.map(converter::toDto);
+				.map(converter::toDto)
+				.orElseThrow(() -> new ResourceNotFoundException(new Error("", "Not Found")));
 	}
 
 	@Override
-	public Optional<JustAEntityDto> update(JustAEntityDto dto) {
+	public JustAEntityDto update(JustAEntityDto dto) {
 		log.info("Service: Updating a entity: " + dto);
 		
 		return repository.findById(dto.getId())
@@ -75,22 +78,19 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 					repository.save(entity);
 					return entity;
 				})
-				.map(converter::toDto);
+				.map(converter::toDto)
+				.orElseThrow(() -> new ResourceNotFoundException(new Error("", "Not Found")));
 	}
 	
 	@Override
-	public Optional<JustAEntity> deleteById(Long id) {
+	public void deleteById(Long id) {
 		log.info("Service: deleting a entity of id: " + id);
-		return repository
-				.findById(id)
-				.filter(JustAEntity::isEnabled)
-				.map(entity ->{
-					entity.setEnabled(false);
-					repository.save(entity);
-					return entity;
-				});
-		
-
+		repository
+			.findById(id)
+			.ifPresent(entity -> {
+				entity.setEnabled(false);
+				repository.save(entity);
+			});
 	}
 	
 	private void validate(JustAEntityDto dto){
@@ -102,7 +102,7 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 		if(repository.existsByRg(dto.getRg()))
 			errors.add(new Error("rg", "entity.rg.unique"));
 		if(!errors.isEmpty())
-			throw new ValidationErrorsException("", errors);
+			throw new ValidationException(errors);
 	}
 	
 	private void validateUpdate(JustAEntity entity, JustAEntityDto dto){
@@ -119,6 +119,6 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 			errors.add(new Error("rg", "entity.rg.unique"));
 		
 		if(!errors.isEmpty())
-			throw new ValidationErrorsException("", errors);
+			throw new ValidationException(errors);
 	}
 }

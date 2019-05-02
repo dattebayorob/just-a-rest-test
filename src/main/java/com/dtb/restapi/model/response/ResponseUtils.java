@@ -1,31 +1,18 @@
 package com.dtb.restapi.model.response;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 
-import com.dtb.restapi.model.exceptions.ValidationErrorsException;
-import com.dtb.restapi.model.exceptions.Error;
+import com.dtb.restapi.model.exceptions.AbstractException;
+import com.dtb.restapi.model.response.impl.ResponseData;
+import com.dtb.restapi.model.response.impl.ResponseError;
 
 public class ResponseUtils{
 	
-	public static<T> ResponseEntity<Response> ok(T obj){
-		return ResponseEntity.ok(Response.data(obj));
+	public static<T> ResponseEntity<Response> ok(T data){
+		return ResponseEntity.ok(ResponseData.data(data));
 	}
 	
-	public static<T> ResponseEntity<Response> badRequest(List<Error> errors){
-		return ResponseEntity.badRequest().body(Response.errors(errors));
-	}
-	
-	public static<T> ResponseEntity<T> notFound(T obj){
-		return ResponseEntity.notFound().build();
-	}
-	
-	public static<T> ResponseEntity<T> unprocessable(){
-		return ResponseEntity.unprocessableEntity().build();
-	}
-	
-	public static ResponseEntity<Response> ex(ValidationErrorsException ex){
-		return ResponseEntity.badRequest().body(Response.errors(ex.getErrors()));
+	public static<T extends AbstractException> ResponseEntity<Response> exception(T ex){
+		return new ResponseEntity<Response>(ResponseError.errors(ex.getErrors()), ex.getHttpStatus());
 	}
 }
