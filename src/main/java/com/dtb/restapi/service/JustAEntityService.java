@@ -1,5 +1,7 @@
 package com.dtb.restapi.service;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -9,11 +11,11 @@ public interface JustAEntityService {
 	
 	Page<JustAEntityDto> findAll(Pageable pageable);
 	
-	JustAEntityDto findById(Long id);
+	Optional<JustAEntityDto> findById(Long id);
 	
-	JustAEntityDto save(JustAEntityDto dto);
+	Optional<JustAEntityDto> save(JustAEntityDto dto);
 	
-	JustAEntityDto update(JustAEntityDto dto);
+	Optional<JustAEntityDto> update(JustAEntityDto dto);
 	
 	void deleteById(Long id);
 }

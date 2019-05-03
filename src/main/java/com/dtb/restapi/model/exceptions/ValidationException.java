@@ -1,12 +1,12 @@
 package com.dtb.restapi.model.exceptions;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindingResult;
+import lombok.Getter;
 
-public class ValidationException extends AbstractException {
+@Getter
+public class ValidationException extends RuntimeException {
 
 
 	/**
@@ -14,23 +14,14 @@ public class ValidationException extends AbstractException {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public ValidationException(List<Error> errors) {
-		this(HttpStatus.BAD_REQUEST, errors);
+	private final List<String> errors;
+	
+	public ValidationException(String ... errors) {
+		this.errors = Arrays.asList(errors);
 	}
 	
-	public ValidationException(BindingResult result) {
-		this(result.getFieldErrors()
-				.stream()
-				.map(error -> {
-					return new Error(
-							error.getField(),
-							error.getDefaultMessage());
-					})
-				.collect(Collectors.toList()));
-	}
-	
-	public ValidationException(HttpStatus httpStatus, List<Error> errors) {
-		super(httpStatus, errors);
+	public ValidationException(List<String> errors) {
+		this.errors = errors;
 	}
 	
 

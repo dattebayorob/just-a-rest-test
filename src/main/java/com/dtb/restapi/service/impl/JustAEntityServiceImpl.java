@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 import com.dtb.restapi.model.converters.EntityDtoConverter;
 import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
-import com.dtb.restapi.model.exceptions.Error;
-import com.dtb.restapi.model.exceptions.ResourceNotFoundException;
 import com.dtb.restapi.model.exceptions.ValidationException;
 import com.dtb.restapi.model.repositories.JustAEntityRepository;
 import com.dtb.restapi.service.JustAEntityService;
@@ -29,8 +27,6 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 	@Autowired
 	private EntityDtoConverter converter;
 	
-	private List<Error> errors;
-
 	@Override
 	public Page<JustAEntityDto> findAll(Pageable pageable) {
 		log.info("Service: returning all entities paginateds");
@@ -41,18 +37,17 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 	}
 
 	@Override
-	public JustAEntityDto findById(Long id) {
+	public Optional<JustAEntityDto> findById(Long id) {
 		log.info("Service: returning entity by id: " + id);
 
 		return repository
 				.findById(id)
 				.filter(JustAEntity::isEnabled)
-				.map(converter::toDto)
-				.orElseThrow(() -> new ResourceNotFoundException(new Error("", "Not Found")));
+				.map(converter::toDto);
 	}
 
 	@Override
-	public JustAEntityDto save(JustAEntityDto dto){
+	public Optional<JustAEntityDto> save(JustAEntityDto dto){
 		log.info("Service: persisting a entity: " + dto);
 		
 		validate(dto);
@@ -60,12 +55,11 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 		return Optional
 				.ofNullable(converter.toEntity(dto))
 				.map(repository::save)
-				.map(converter::toDto)
-				.orElseThrow(() -> new ResourceNotFoundException(new Error("", "Not Found")));
+				.map(converter::toDto);
 	}
 
 	@Override
-	public JustAEntityDto update(JustAEntityDto dto) {
+	public Optional<JustAEntityDto> update(JustAEntityDto dto) {
 		log.info("Service: Updating a entity: " + dto);
 		
 		return repository.findById(dto.getId())
@@ -78,8 +72,7 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 					repository.save(entity);
 					return entity;
 				})
-				.map(converter::toDto)
-				.orElseThrow(() -> new ResourceNotFoundException(new Error("", "Not Found")));
+				.map(converter::toDto);
 	}
 	
 	@Override
@@ -94,29 +87,29 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 	}
 	
 	private void validate(JustAEntityDto dto){
-		errors = new LinkedList<>();
+		List<String> errors = new LinkedList<>();
 		if(repository.existsByName(dto.getName()))
-			errors.add(new Error("name", "entity.name.unique"));
+			errors.add("entity.name.unique");
 		if(repository.existsByCpf(dto.getCpf()))
-			errors.add(new Error("cpf", "entity.cpf.unique"));
+			errors.add("entity.cpf.unique");
 		if(repository.existsByRg(dto.getRg()))
-			errors.add(new Error("rg", "entity.rg.unique"));
+			errors.add("entity.rg.unique");
 		if(!errors.isEmpty())
 			throw new ValidationException(errors);
 	}
 	
 	private void validateUpdate(JustAEntity entity, JustAEntityDto dto){
-		errors = new LinkedList<>();
+		List<String> errors = new LinkedList<>();
 		Predicate<JustAEntity> isNameUnique = e -> !e.getName().equals(dto.getName())&&repository.existsByName(dto.getName());
 		Predicate<JustAEntity> isCpfUnique = e -> !e.getCpf().equals(dto.getCpf())&&repository.existsByCpf(dto.getCpf());
 		Predicate<JustAEntity> isRgUnique = e -> !e.getRg().equals(dto.getRg())&&repository.existsByRg(dto.getRg());
 		
 		if(isNameUnique.test(entity))
-			errors.add(new Error("name", "entity.name.unique"));
+			errors.add("entity.name.unique");
 		if(isCpfUnique.test(entity))
-			errors.add(new Error("cpf", "entity.cpf.unique"));
+			errors.add("entity.cpf.unique");
 		if(isRgUnique.test(entity))
-			errors.add(new Error("rg", "entity.rg.unique"));
+			errors.add("entity.rg.unique");
 		
 		if(!errors.isEmpty())
 			throw new ValidationException(errors);
