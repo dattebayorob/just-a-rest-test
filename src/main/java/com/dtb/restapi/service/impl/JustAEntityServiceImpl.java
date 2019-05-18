@@ -10,7 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.dtb.restapi.model.converters.EntityDtoConverter;
+import com.dtb.restapi.model.converters.JustAEntityMapper;
 import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
 import com.dtb.restapi.model.exceptions.ValidationException;
@@ -25,7 +25,7 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 	@Autowired
 	private JustAEntityRepository repository;
 	@Autowired
-	private EntityDtoConverter converter;
+	private JustAEntityMapper converter;
 	
 	@Override
 	public Page<JustAEntityDto> findAll(Pageable pageable) {

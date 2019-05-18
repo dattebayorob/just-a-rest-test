@@ -33,7 +33,7 @@ import lombok.extern.log4j.Log4j2;
 
 @RestController
 @RequestMapping("/entities")
-@CrossOrigin(value = "*")
+@CrossOrigin(allowCredentials = "true", origins = "*")
 @Log4j2
 public class JustAEntityController {
 	@Autowired

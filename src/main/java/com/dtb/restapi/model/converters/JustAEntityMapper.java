@@ -8,7 +8,7 @@ import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
 
 @Component
-public class EntityDtoConverter{
+public class JustAEntityMapper{
 	@Autowired
 	private ModelMapper mapper;
 
