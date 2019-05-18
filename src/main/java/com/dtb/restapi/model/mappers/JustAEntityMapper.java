@@ -1,29 +1,16 @@
-package com.dtb.restapi.model.converters;
+package com.dtb.restapi.model.mappers;
 
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
 
 import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
 
-@Component
-public class JustAEntityMapper{
-	@Autowired
-	private ModelMapper mapper;
-
-	public JustAEntity toEntity(JustAEntityDto dto) {
-		return mapper.map(dto, JustAEntity.class);
-	}
-	public JustAEntity toEntity(JustAEntityDto dto, JustAEntity source) {
-		dto.setId(source.getId());
-		mapper.map(dto, source);
-		return source;
-		
-	}
-	public JustAEntityDto toDto(JustAEntity entity){
-		return mapper.map(entity, JustAEntityDto.class);
-	}
+@Mapper(componentModel = "spring")
+public interface JustAEntityMapper {
 	
 	
+	
+	JustAEntity toEntity(JustAEntityDto dto);
+	
+	JustAEntityDto toDto(JustAEntity entity);
 }

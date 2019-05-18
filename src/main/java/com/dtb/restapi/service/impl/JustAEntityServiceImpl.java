@@ -10,10 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.dtb.restapi.model.converters.JustAEntityMapper;
 import com.dtb.restapi.model.dtos.JustAEntityDto;
 import com.dtb.restapi.model.entities.JustAEntity;
 import com.dtb.restapi.model.exceptions.ValidationException;
+import com.dtb.restapi.model.mappers.JustAEntityMapper;
 import com.dtb.restapi.model.repositories.JustAEntityRepository;
 import com.dtb.restapi.service.JustAEntityService;
 
@@ -25,7 +25,7 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 	@Autowired
 	private JustAEntityRepository repository;
 	@Autowired
-	private JustAEntityMapper converter;
+	private JustAEntityMapper mapper;
 	
 	@Override
 	public Page<JustAEntityDto> findAll(Pageable pageable) {
@@ -33,7 +33,7 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 
 		return repository
 				.findByEnabled(true, pageable)
-				.map(converter::toDto);
+				.map(mapper::toDto);
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 		return repository
 				.findById(id)
 				.filter(JustAEntity::isEnabled)
-				.map(converter::toDto);
+				.map(mapper::toDto);
 	}
 
 	@Override
@@ -53,9 +53,9 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 		validate(dto);
 		
 		return Optional
-				.ofNullable(converter.toEntity(dto))
+				.ofNullable(mapper.toEntity(dto))
 				.map(repository::save)
-				.map(converter::toDto);
+				.map(mapper::toDto);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 					repository.save(entity);
 					return entity;
 				})
-				.map(converter::toDto);
+				.map(mapper::toDto);
 	}
 	
 	@Override
