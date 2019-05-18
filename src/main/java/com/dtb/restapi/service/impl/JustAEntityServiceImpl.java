@@ -66,12 +66,10 @@ public class JustAEntityServiceImpl implements JustAEntityService {
 				.filter(JustAEntity::isEnabled)
 				.map(entity -> {
 					validateUpdate(entity, dto);
-					entity.setName(dto.getName());
-					entity.setCpf(dto.getCpf());
-					entity.setRg(dto.getRg());
-					repository.save(entity);
-					return entity;
+					return mapper
+						.toEntity(dto, entity);
 				})
+				.map(repository::save)
 				.map(mapper::toDto);
 	}
 	

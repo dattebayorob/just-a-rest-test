@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -35,12 +34,6 @@ public class JustAEntity {
 	private boolean enabled;
 	@Column(name = "date", nullable = false)
 	private LocalDateTime date;
-	
-	@PrePersist
-	public void prePersist(){
-		date = LocalDateTime.now();
-		enabled = true;
-	}
 	
 	
 }
