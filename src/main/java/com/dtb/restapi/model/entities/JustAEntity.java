@@ -7,18 +7,20 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Builder.Default;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "entity")
 @Builder
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class JustAEntity {
@@ -32,15 +34,10 @@ public class JustAEntity {
 	@Column(name = "rg", nullable = false, unique = true)
 	private String rg;
 	@Column(name = "enabled", nullable = false)
-	private boolean enabled;
+	@Default
+	private boolean enabled = true;
 	@Column(name = "date", nullable = false)
-	private LocalDateTime date;
-	
-	@PrePersist
-	public void prePersist(){
-		date = LocalDateTime.now();
-		enabled = true;
-	}
-	
+	@Default
+	private LocalDateTime date = LocalDateTime.now();	
 	
 }
